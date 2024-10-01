@@ -15,56 +15,44 @@ data class Comment(
     val groupsCanPost: Boolean = false, //— информация о том, могут ли сообщества комментировать запись;
     val canClose: Boolean = false, //— может ли текущий пользователь закрыть комментарии к записи;
     val canOpen: Boolean = false  //— может ли текущий пользователь открыть комментарии к записи.
-) {
-    override fun toString(): String {
-        return "Comment ($count, $canPost, $groupsCanPost, $canClose, $canOpen)"
-    }
-}
+)
+
+data class CommentDelete(
+    var count: Int = 0, // — количество комментариев;
+    val canPost: Boolean = false, //— информация о том, может ли текущий пользователь комментировать запись (1 — может, 0 — не может);
+    val groupsCanPost: Boolean = false, //— информация о том, могут ли сообщества комментировать запись;
+    val canClose: Boolean = false, //— может ли текущий пользователь закрыть комментарии к записи;
+    val canOpen: Boolean = false  //— может ли текущий пользователь открыть комментарии к записи.
+)
 
 public interface MutableCollections<E> : Collection<E>, MutableIterator<E> {
-    fun add(note: Note): Int {
+    fun add(note: E): Boolean
 
-        return note.noteId
-    }
     //Создает новую заметку у текущего пользователя.
+    fun createComment(comment: E): Int
 
-    fun createComment(comment: Comment): Int {
-
-        return comment.count
-    }
     // Добавляет новый комментарий к заметке.
-
-    fun delete(noteId: Int) {
-
-    }
+    fun delete(noteId: E)
 
     //Удаляет заметку текущего пользователя.
+    fun deleteComment(count: E)
 
-    fun deleteComment(count: Int) {
-
-    }
     // Удаляет комментарий к заметке.
+    fun edit(noteId: E)
 
-    fun edit() {
-
-    }
     // Редактирует заметку текущего пользователя.
+    fun editComment(count: E)
 
-    fun editComment() {
-
-    }
     // Редактирует указанный комментарий у заметки.
+    fun get()
 
-    fun get() {}
     //Возвращает список заметок, созданных пользователем.
+    fun getById(noteId: E)
 
-    fun getById() {}
     //Возвращает заметку по её id.
-
-    fun getComments() {}
+    fun getComments(count: E)
 
     // Возвращает список комментариев к заметке.
-    fun restoreComment() {}
+    fun restoreComment(count: E)
     //Восстанавливает удалённый комментарий.
-
 }
