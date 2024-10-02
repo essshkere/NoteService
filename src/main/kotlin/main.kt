@@ -1,58 +1,66 @@
-fun main() {}
+fun main() {
+}
 
 data class Note(
-    var noteId: Int,  // айди заметки
-    val title: String, // заголовок заметки
-    val text: String, // текст заметки
-    val privacy: Int, // Уровень доступа к заметке. Возможные значения: 0 — все пользователи, 1 — только друзья, 2 — друзья и друзья друзей, 3 — только пользователь.
-    val commentPrivacy: Int, // Уровень доступа к комментированию заметки. Возможные значения:  0 — все пользователи, 1 — только друзья,  2 — друзья и друзья друзей, 3 — только пользователь.
-    val comments: Comment = Comment() // комментарии к записи
+    var id: Int = 0,
+    val title: String = "0",
+    val text: String = "0",
+    var isDeleted: Boolean = false
+    val comments: Comment = Comment()
 )
 
 data class Comment(
-    var count: Int = 0, // — количество комментариев;
-    val canPost: Boolean = false, //— информация о том, может ли текущий пользователь комментировать запись (1 — может, 0 — не может);
-    val groupsCanPost: Boolean = false, //— информация о том, могут ли сообщества комментировать запись;
-    val canClose: Boolean = false, //— может ли текущий пользователь закрыть комментарии к записи;
-    val canOpen: Boolean = false  //— может ли текущий пользователь открыть комментарии к записи.
+    var id : Int = 0,
+    val text: String = "0",
+    var isDeleted: Boolean = false
 )
 
-data class CommentDelete(
-    var count: Int = 0, // — количество комментариев;
-    val canPost: Boolean = false, //— информация о том, может ли текущий пользователь комментировать запись (1 — может, 0 — не может);
-    val groupsCanPost: Boolean = false, //— информация о том, могут ли сообщества комментировать запись;
-    val canClose: Boolean = false, //— может ли текущий пользователь закрыть комментарии к записи;
-    val canOpen: Boolean = false  //— может ли текущий пользователь открыть комментарии к записи.
-)
+// Интерфейс репозитория
+interface Repository<T> {
+    fun create(item: T): T
+    fun read(id: String): T?
+    fun update(item: T): T?
+    fun delete(id: String): Boolean
+}
 
-public interface MutableCollections<E> : Collection<E>, MutableIterator<E> {
-    fun add(note: E): Boolean
+// Реализация репозитория в памяти
+class InMemoryRepository<T>(private val items: MutableList<T> = mutableListOf()) : Repository<T> {
 
-    //Создает новую заметку у текущего пользователя.
-    fun createComment(comment: E): Int
+    override fun create(item: T): T {
+        items.add(item)
+        return item
+    }
 
-    // Добавляет новый комментарий к заметке.
-    fun delete(noteId: E)
+    override fun read(id: String): T? {
+        return items.find { (it as? Note)?.id == id || (it as? Comment)?.id == id }
+    }
 
-    //Удаляет заметку текущего пользователя.
-    fun deleteComment(count: E)
+    override fun update(item: T): T? {
+        val index = items.indexOfFirst { (it as? Note)?.id == (item as? Note)?.id || (it as? Comment)?.id == (item as? Comment)?.id }
+        return if (index != -1) {
+            items[index] = item
+            item
+        } else {
+            null
+        }
+    }
 
-    // Удаляет комментарий к заметке.
-    fun edit(noteId: E)
-
-    // Редактирует заметку текущего пользователя.
-    fun editComment(count: E)
-
-    // Редактирует указанный комментарий у заметки.
-    fun get()
-
-    //Возвращает список заметок, созданных пользователем.
-    fun getById(noteId: E)
-
-    //Возвращает заметку по её id.
-    fun getComments(count: E)
-
-    // Возвращает список комментариев к заметке.
-    fun restoreComment(count: E)
-    //Восстанавливает удалённый комментарий.
+    override fun delete(id: String): Boolean {
+        val item = read(id)
+        return if (item != null) {
+            when (item) {
+                is Note -> {
+                    item.isDeleted = true
+                    true
+                }
+                is Comment -> {
+                    item.isDeleted = true
+                    true
+                }
+                else -> false
+            }
+        } else {
+            false
+        }
+    }
 }
