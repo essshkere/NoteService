@@ -1,66 +1,95 @@
 fun main() {
+    val noteService = ServiceCRUD<Note>()
+    val commentService = ServiceCRUD<Comment>()
+    val addedNote = noteService.create(Note())
+    val addedComment = commentService.create(Comment())
+    val addedNote2 = noteService.create(Note())
+    val addedComment2 = commentService.create(Comment())
+
+
+    val addedNot = noteService.create(Note())
+    val addedNot2 = noteService.create(Note())
+    val updateNote = noteService.update(Note(1))
+    val result = updateNote?.id
+    val updateNote2 = noteService.update(Note(200))
 }
 
 data class Note(
     var id: Int = 0,
-    val title: String = "0",
-    val text: String = "0",
+    var text: String = "0",
+    val comment: Comment = Comment(),
     var isDeleted: Boolean = false
-    val comments: Comment = Comment()
 )
+
 
 data class Comment(
-    var id : Int = 0,
-    val text: String = "0",
+    var id: Int = 0,
+    val noteId: Int = 0,
+    var text: String = "0",
     var isDeleted: Boolean = false
 )
 
-// Интерфейс репозитория
-interface Repository<T> {
+
+interface Service<T> {
     fun create(item: T): T
-    fun read(id: String): T?
+    fun read(id: Int): T?
     fun update(item: T): T?
-    fun delete(id: String): Boolean
+    fun delete(id: Int): Boolean
 }
 
-// Реализация репозитория в памяти
-class InMemoryRepository<T>(private val items: MutableList<T> = mutableListOf()) : Repository<T> {
+
+class ServiceCRUD<T>(private val items: MutableList<T> = mutableListOf()) : Service<T> {
+    private var i = 1
 
     override fun create(item: T): T {
+        if (item is Note) {
+            item.id = i++
+            println("I $i")
+        } else if (item is Comment) {
+            item.id = i++
+        }
         items.add(item)
         return item
     }
 
-    override fun read(id: String): T? {
-        return items.find { (it as? Note)?.id == id || (it as? Comment)?.id == id }
+    override fun read(id: Int): T? {
+        return items.find {
+            if (it is Note) {
+                it.id == id
+            } else if (it is Comment) {
+                it.id == id
+            } else {
+                false
+            }
+        }
     }
 
     override fun update(item: T): T? {
-        val index = items.indexOfFirst { (it as? Note)?.id == (item as? Note)?.id || (it as? Comment)?.id == (item as? Comment)?.id }
-        return if (index != -1) {
+        val index =
+            items.indexOfFirst {
+                (it as? Note)?.id == (item as? Note)?.id ||
+                        (it as? Comment)?.id == (item as? Comment)?.id
+            }
+        println(index)
+        if (index != -1) {
             items[index] = item
-            item
-        } else {
-            null
+            return item
         }
+        return null
     }
 
-    override fun delete(id: String): Boolean {
+
+    override fun delete(id: Int): Boolean {
         val item = read(id)
-        return if (item != null) {
-            when (item) {
-                is Note -> {
-                    item.isDeleted = true
-                    true
-                }
-                is Comment -> {
-                    item.isDeleted = true
-                    true
-                }
-                else -> false
+        if (item != null) {
+            if (item is Note) {
+                item.isDeleted = true
+                return true
+            } else if (item is Comment) {
+                item.isDeleted = true
+                return true
             }
-        } else {
-            false
         }
+        return false
     }
 }
