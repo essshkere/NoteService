@@ -5,8 +5,6 @@ fun main() {
     val addedComment = commentService.create(Comment())
     val addedNote2 = noteService.create(Note())
     val addedComment2 = commentService.create(Comment())
-
-
     val addedNot = noteService.create(Note())
     val addedNot2 = noteService.create(Note())
     val updateNote = noteService.update(Note(1))
@@ -21,14 +19,12 @@ data class Note(
     var isDeleted: Boolean = false
 )
 
-
 data class Comment(
     var id: Int = 0,
     val noteId: Int = 0,
     var text: String = "0",
     var isDeleted: Boolean = false
 )
-
 
 interface Service<T> {
     fun create(item: T): T
@@ -37,14 +33,12 @@ interface Service<T> {
     fun delete(id: Int): Boolean
 }
 
-
 class ServiceCRUD<T>(private val items: MutableList<T> = mutableListOf()) : Service<T> {
     private var i = 1
 
     override fun create(item: T): T {
         if (item is Note) {
             item.id = i++
-            println("I $i")
         } else if (item is Comment) {
             item.id = i++
         }
@@ -70,7 +64,6 @@ class ServiceCRUD<T>(private val items: MutableList<T> = mutableListOf()) : Serv
                 (it as? Note)?.id == (item as? Note)?.id ||
                         (it as? Comment)?.id == (item as? Comment)?.id
             }
-        println(index)
         if (index != -1) {
             items[index] = item
             return item
