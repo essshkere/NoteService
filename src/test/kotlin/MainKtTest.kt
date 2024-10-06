@@ -5,7 +5,7 @@ class MainKtTest {
 
     @Test
     fun addTest() {
-        val noteService = ServiceCRUD<Note>()
+        val noteService = NoteService()
         val addedNote = noteService.create(Note())
         val idTest = addedNote.id
         assertEquals(1, idTest)
@@ -13,7 +13,7 @@ class MainKtTest {
 
     @Test
     fun readNoteTestTrue() {
-        val noteService = ServiceCRUD<Note>()
+        val noteService = NoteService()
         val addedNote = noteService.create(Note())
         val addedNote2 = noteService.create(Note())
         val addedNote3 = noteService.read(1)
@@ -22,7 +22,7 @@ class MainKtTest {
     }
     @Test
     fun readNoteTestNull() {
-        val noteService = ServiceCRUD<Note>()
+        val noteService = NoteService()
         val addedNote = noteService.create(Note())
         val addedNote2 = noteService.create(Note())
         val addedNote3 = noteService.read(4)
@@ -31,7 +31,7 @@ class MainKtTest {
     }
     @Test
     fun readCommentTestTrue() {
-        val commentService = ServiceCRUD<Comment>()
+        val commentService = CommentService()
         val addedComment = commentService.create(Comment())
         val addedComment2 = commentService.create(Comment())
         val readComment = commentService.read(1)
@@ -40,7 +40,7 @@ class MainKtTest {
     }
     @Test
     fun readCommentTestNull() {
-        val commentService = ServiceCRUD<Comment>()
+        val commentService = CommentService()
         val addedComment = commentService.create(Comment())
         val addedComment2 = commentService.create(Comment())
         val readComment = commentService.read(4)
@@ -49,24 +49,41 @@ class MainKtTest {
     }
     @Test
     fun updateNoteTestTrue() {
-        val noteService = ServiceCRUD<Note>()
+        val noteService = NoteService()
         val addedNote = noteService.create(Note())
         val addedNote2 = noteService.create(Note())
-        val updateNote = noteService.update(Note(1,"update"))
-        val result = updateNote?.text
+        val updateNote = noteService.update(Note(1,text = "update"))
+            val result = updateNote?.text
         assertEquals("update", result)
+    }
+    @Test
+    fun updateNoteTestNull() {
+        val noteService = NoteService()
+        val addedNote = noteService.create(Note())
+        val addedNote2 = noteService.create(Note())
+        val updateNote = noteService.update(Note(200,text = "update"))
+        val result = updateNote?.text
+        assertEquals(null, result)
     }
 
     @Test
     fun updateCommentTestTrue() {
-        val commentService = ServiceCRUD<Comment>()
+        val commentService = CommentService()
         val addedComment = commentService.create(Comment())
         val addedComment2 = commentService.create(Comment())
-        val updateComment = commentService.update(Comment(1))
-        val result = updateComment?.id
-        assertEquals(1, result)
+        val updateComment = commentService.update(Comment(1 , text = "update"))
+        val result = updateComment?.text
+        assertEquals( "update", result)
     }
-
+    @Test
+    fun updateCommentTestNull() {
+        val commentService = CommentService()
+        val addedComment = commentService.create(Comment())
+        val addedComment2 = commentService.create(Comment())
+        val updateComment = commentService.update(Comment(200, text = "update"))
+        val result = updateComment?.text
+        assertEquals(null, result)
+    }
 
 
 }
